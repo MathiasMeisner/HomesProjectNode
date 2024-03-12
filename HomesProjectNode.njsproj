@@ -28,6 +28,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include=".eslintrc.js" />
+    <Content Include="Models\connectionstring.js" />
     <Content Include="server.js" />
     <Content Include="package.json" />
     <Content Include="README.md" />
