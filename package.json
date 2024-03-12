@@ -1,0 +1,14 @@
+{
+  "name": "homes-project-node",
+  "version": "0.0.0",
+  "description": "HomesProjectNode",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  },
+  "devDependencies": {
+    "eslint": "^8.21.0"
+  },
+  "eslintConfig": {
+  }
+}
