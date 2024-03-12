@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include=".eslintrc.js" />
+    <Content Include="Managers\HomeImportService.js" />
     <Content Include="Models\connectionstring.js" />
     <Content Include="server.js" />
     <Content Include="package.json" />
