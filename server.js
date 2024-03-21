@@ -8,10 +8,25 @@ const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const { importHomesFromExcel } = require('./Managers/HomeImportService');
 const { connectionString } = require('./Models/connectionstring');
+const fs = require('fs');
 
 const app = express();
 const port = process.env.PORT || 1337;
-const excelFilePath = 'C:\\code\\BoligsidenWebScrape\\output_excel_file.xlsx';
+
+// Function to choose the appropriate Excel file path
+function getExcelFilePath() {
+    const ec2FilePath = '/home/ec2-user/HomesProjectNode/output_excel_file.xlsx';
+    const localFilePath = 'C:\\code\\BoligsidenWebScrape\\output_excel_file.xlsx';
+
+    try {
+        fs.accessSync(ec2FilePath, fs.constants.F_OK);
+        return ec2FilePath; // Return EC2 file path if it exists
+    } catch (error) {
+        return localFilePath; // Return local file path if EC2 file path doesn't exist
+    }
+}
+
+const excelFilePath = getExcelFilePath(); // Choose Excel file path based on environment
 
 // Middleware to set Content-Type header for JSON responses
 app.use((req, res, next) => {
@@ -34,7 +49,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 client.connect()
     .then(() => {
         console.log('Connected to the MongoDB database');
-        return importHomesFromExcel(uri, excelFilePath); // Pass the MongoDB URI instead of connectionString
+        return importHomesFromExcel(uri, excelFilePath); // Pass the MongoDB URI and Excel file path
     })
     .catch(err => {
         console.error('Error connecting to the database:', err);
