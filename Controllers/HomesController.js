@@ -1,7 +1,7 @@
 // HomesController.js
 
 const express = require('express');
-const HomesManager = require('../Managers/HomesManager');
+const { HomesManager } = require('../Managers/HomesManager');
 
 const router = express.Router();
 const homesManager = new HomesManager(process.env.MONGODB_URI);

@@ -22,4 +22,11 @@ class HomesManager {
     }
 }
 
-module.exports = HomesManager;
+// Exporting the getAllHomes function separately
+async function getAllHomes(uri) {
+    const manager = new HomesManager(uri);
+    return await manager.getAllHomes();
+}
+
+module.exports = { HomesManager, getAllHomes };
+

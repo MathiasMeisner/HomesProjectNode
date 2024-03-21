@@ -76,25 +76,34 @@ async function insertHome(client, home) {
                 );
 
                 if (updateResult.modifiedCount === 0) {
-                    console.log('Failed to update existing home:', home.address);
+                    if (process.env.NODE_ENV !== 'test') {
+                        console.log('Failed to update existing home:', home.address);
+                    }
                 }
             } else {
-                console.log('New home has no image URL, skipping update:', home.address);
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log('New home has no image URL, skipping update:', home.address);
+                }
             }
         } else {
             // Insert the home into the homes collection if it doesn't already exist
             const insertResult = await homesCollection.insertOne(home);
 
             if (insertResult.insertedCount > 0) {
-                console.log('New home inserted into the database:', home.address);
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log('New home inserted into the database:', home.address);
+                }
             } else {
-                console.log('Failed to insert new home into the database:', home.address);
+                if (process.env.NODE_ENV !== 'test') {
+                    console.log('Failed to insert new home into the database:', home.address);
+                }
             }
         }
     } catch (error) {
         console.error('Error inserting home into the database:', error);
     }
 }
+
 
 
 module.exports = { insertHome, importHomesFromExcel };
