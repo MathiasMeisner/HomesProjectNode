@@ -45,13 +45,29 @@ describe('GET /api/homes', () => {
 });
 
 // Testing if importHomesFromExcel is importing the homes from the Excel file
+const fs = require('fs');
+
+function getExcelFilePath() {
+    const ec2FilePath = '/home/ec2-user/HomesProjectNode/output_excel_file.xlsx';
+    const localFilePath = 'C:\\code\\BoligsidenWebScrape\\output_excel_file.xlsx';
+
+    try {
+        fs.accessSync(ec2FilePath, fs.constants.F_OK);
+        return ec2FilePath; // Return EC2 file path if it exists
+    } catch (error) {
+        return localFilePath; // Return local file path if EC2 file path doesn't exist
+    }
+}
+
+const excelFilePath = getExcelFilePath(); // Choose Excel file path based on environment
+
 describe('importHomesFromExcel', () => {
     it('should import homes from test Excel file', async () => {
-        const excelFilePath = 'C:\\code\\BoligsidenWebScrape\\output_excel_file.xlsx';
-        const importedHomes = await importHomesFromExcel(process.env.MONGODB_URI, excelFilePath); // Pass MongoDB URI
+        const importedHomes = await importHomesFromExcel(process.env.MONGODB_URI, excelFilePath);
 
         // Check that the importedHomes array is not empty
         expect(importedHomes).toBeDefined();
         expect(Array.isArray(importedHomes)).toBe(true);
     })
 })
+
