@@ -1,22 +1,25 @@
-const { Pool } = require('pg');
-const { connectionString } = require('../Models/connectionstring');
+// HomesManager.js
 
-const pool = new Pool({
-    connectionString: connectionString,
-});
+const { MongoClient } = require('mongodb');
 
-async function getHomes() {
-    let client;
-    try {
-        client = await pool.connect();
-        const query = 'SELECT * FROM homes ORDER BY id';
-        const result = await client.query(query);
-        return result.rows; // Return fetched homes
-    } finally {
-        if (client) {
-            client.release(); // Release the client back to the pool
+class HomesManager {
+    constructor(uri) {
+        this.client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    }
+
+    async getAllHomes() {
+        try {
+            await this.client.connect();
+            const homesCollection = this.client.db().collection('homes');
+            const homes = await homesCollection.find({}).toArray();
+            return homes;
+        } catch (error) {
+            console.error('Error fetching homes:', error);
+            return [];
+        } finally {
+            await this.client.close();
         }
     }
 }
 
-module.exports = { getHomes };
+module.exports = HomesManager;

@@ -1,3 +1,3 @@
-const connectionString = process.env.DB_CONNECTION_STRING;
+const connectionString = process.env.MONGODB_URI;
 
 module.exports = { connectionString };

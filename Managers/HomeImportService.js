@@ -1,12 +1,10 @@
 // homeImportService.js
 
 const ExcelJS = require('exceljs');
-const { Client } = require('pg');
+const { MongoClient } = require('mongodb');
 
-async function importHomesFromExcel(connectionString, excelFilePath) {
-    const client = new Client({
-        connectionString: connectionString,
-    });
+async function importHomesFromExcel(uri, excelFilePath) {
+    const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
     let importedHomes = [];
 
@@ -26,15 +24,16 @@ async function importHomesFromExcel(connectionString, excelFilePath) {
         }
 
         // Get the addresses of homes currently stored in the database
-        const queryResult = await client.query('SELECT address FROM homes');
-        const addressesInDatabase = queryResult.rows.map(row => row.address);
+        const homesCollection = client.db().collection('homes');
+        const queryResult = await homesCollection.find({}, { projection: { _id: 0, address: 1 } }).toArray();
+        const addressesInDatabase = queryResult.map(row => row.address);
 
         // Find addresses that are in the database but not in the Excel file
         const addressesToDelete = addressesInDatabase.filter(address => !addressesInExcel.includes(address));
 
         // Delete homes with addresses found in addressesToDelete
         for (const address of addressesToDelete) {
-            await client.query('DELETE FROM homes WHERE address = $1', [address]);
+            await homesCollection.deleteOne({ address: address });
         }
 
         // Import new homes from the Excel file
@@ -49,82 +48,53 @@ async function importHomesFromExcel(connectionString, excelFilePath) {
                 imageurl: worksheet.getCell(row, 7).value,
             };
 
-            await insertHome(connectionString, home); // Call the insertHome function directly
+            await insertHome(client, home); // Call the insertHome function directly
             importedHomes.push(home); // Add the imported home to the list
         }
     } catch (error) {
         console.error('Error:', error);
     } finally {
-        await client.end();
+        await client.close();
     }
 
     return importedHomes; // Return the list of imported homes
 }
 
-async function insertHome(connectionString, home) {
-    const client = new Client({
-        connectionString: connectionString,
-    });
-
+async function insertHome(client, home) {
     try {
-        await client.connect();
+        const homesCollection = client.db().collection('homes');
 
         // Check if the home already exists in the database based on the address
-        const commandText = `
-        SELECT *
-        FROM homes
-        WHERE Address = $1
-    `;
-        const values = [home.address];
-        const { rows } = await client.query(commandText, values);
+        const existingHome = await homesCollection.findOne({ address: home.address });
 
-        if (rows.length > 0) {
+        if (existingHome) {
             // Update the existing home with the new image URL if it is not null
-            const existingHome = rows[0];
             if (home.imageurl) {
-                existingHome.imageurl = home.imageurl;
-                const updateCommandText = `
-                UPDATE homes
-                SET ImageUrl = $1
-                WHERE id = $2
-            `;
-                const updateValues = [home.imageurl, existingHome.id];
-                const { rowCount } = await client.query(updateCommandText, updateValues);
+                const updateResult = await homesCollection.updateOne(
+                    { address: home.address },
+                    { $set: { imageurl: home.imageurl } }
+                );
 
-                if (rowCount === 0) {
-                    console.log('Failed to update existing home.');
+                if (updateResult.modifiedCount === 0) {
+                    console.log('Failed to update existing home:', home.address);
                 }
             } else {
-                console.log('New home has no image URL, skipping update.');
+                console.log('New home has no image URL, skipping update:', home.address);
             }
         } else {
-            // Insert the home into the homes table if it doesn't already exist
-            const insertCommandText = `
-            INSERT INTO homes (Municipality, Address, Price, SquareMeters, ConstructionYear, EnergyLabel, ImageUrl)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-        `;
-            const insertValues = [
-                home.municipality,
-                home.address,
-                home.price,
-                home.squaremeters,
-                home.constructionyear,
-                home.energylabel,
-                home.imageurl || null,
-            ];
-            const { rowCount } = await client.query(insertCommandText, insertValues);
+            // Insert the home into the homes collection if it doesn't already exist
+            const insertResult = await homesCollection.insertOne(home);
 
-            if (rowCount > 0) {
-                console.log('New home inserted into the database.');
+            if (insertResult.insertedCount > 0) {
+                console.log('New home inserted into the database:', home.address);
             } else {
-                console.log('Failed to insert new home into the database.');
+                console.log('Failed to insert new home into the database:', home.address);
             }
         }
     } catch (error) {
-        console.error('Error:', error);
-    } finally {
-        await client.end();
+        console.error('Error inserting home into the database:', error);
     }
 }
+
 
 module.exports = { insertHome, importHomesFromExcel };

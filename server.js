@@ -5,9 +5,9 @@ require('dotenv').config();
 const http = require('http');
 const express = require('express');
 const cors = require('cors');
-const { Client } = require('pg');
-const { connectionString } = require('./Models/connectionstring');
+const { MongoClient } = require('mongodb');
 const { importHomesFromExcel } = require('./Managers/HomeImportService');
+const { connectionString } = require('./Models/connectionstring');
 
 const app = express();
 const port = process.env.PORT || 1337;
@@ -22,27 +22,26 @@ app.use((req, res, next) => {
 // Import the HomesController router
 const homesRouter = require('./Controllers/HomesController');
 
-console.log('DB_CONNECTION_STRING:', process.env.DB_CONNECTION_STRING);
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 // Add CORS middleware
 app.use(cors());
 
-// Connect to the PostgreSQL database and import homes from Excel
-const client = new Client({
-    connectionString: connectionString,
-});
+// Connect to the MongoDB database and import homes from Excel
+const uri = process.env.MONGODB_URI || connectionString; // Use MongoDB URI from .env file or fallback to the one from connectionstring.js
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect()
     .then(() => {
-        console.log('Connected to the PostgreSQL database');
-        return importHomesFromExcel(connectionString, excelFilePath);
+        console.log('Connected to the MongoDB database');
+        return importHomesFromExcel(uri, excelFilePath); // Pass the MongoDB URI instead of connectionString
     })
     .catch(err => {
         console.error('Error connecting to the database:', err);
         process.exit(1);
     });
 
-// Define a route handler for the root path
+// Define a route handler for the root path 
 app.get('/', (req, res) => {
     res.send('Welcome to the HomeNode API!');
 });

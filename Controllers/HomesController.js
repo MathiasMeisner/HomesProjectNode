@@ -1,11 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const { getHomes } = require('../Managers/HomesManager');
+// HomesController.js
 
-// GET: /api/homes
+const express = require('express');
+const HomesManager = require('../Managers/HomesManager');
+
+const router = express.Router();
+const homesManager = new HomesManager(process.env.MONGODB_URI);
+
 router.get('/', async (req, res) => {
     try {
-        const homes = await getHomes();
+        const homes = await homesManager.getAllHomes();
         res.json(homes);
     } catch (error) {
         console.error('Error fetching homes:', error);

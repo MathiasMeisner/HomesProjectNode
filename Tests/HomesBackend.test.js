@@ -2,7 +2,7 @@
 delete require.cache[require.resolve('dotenv')];
 require('dotenv').config();
 
-const { Client } = require('pg');
+const { MongoClient } = require('mongodb');
 const { getHomes } = require('../Managers/HomesManager');
 const { importHomesFromExcel } = require('../Managers/HomeImportService')
 const request = require('supertest');
@@ -12,16 +12,14 @@ const app = require('../server');
 let client;
 
 beforeAll(async () => {
-    // Initialize the database connection
-    client = new Client({
-        connectionString: process.env.DB_CONNECTION_STRING
-    });
+    // Initialize the MongoDB connection
+    client = new MongoClient(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
     await client.connect();
 });
 
 afterAll(async () => {
-    // Close the database connection after all tests are done
-    await client.end();
+    // Close the MongoDB connection after all tests are done
+    await client.close();
 });
 
 // Test suites:
@@ -30,7 +28,7 @@ afterAll(async () => {
 describe('HomesManager', () => {
     describe('getHomes', () => {
         it('should return an array of homes', async () => {
-            const homes = await getHomes();
+            const homes = await getHomes(process.env.MONGODB_URI); // Pass MongoDB URI
             expect(Array.isArray(homes)).toBe(true);
         })
     })
@@ -50,7 +48,7 @@ describe('GET /api/homes', () => {
 describe('importHomesFromExcel', () => {
     it('should import homes from test Excel file', async () => {
         const excelFilePath = 'C:\\code\\BoligsidenWebScrape\\output_excel_file.xlsx';
-        const importedHomes = await importHomesFromExcel(excelFilePath);
+        const importedHomes = await importHomesFromExcel(process.env.MONGODB_URI, excelFilePath); // Pass MongoDB URI
 
         // Check that the importedHomes array is not empty
         expect(importedHomes).toBeDefined();
