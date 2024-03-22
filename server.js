@@ -16,7 +16,7 @@ const port = process.env.PORT || 1337;
 // Function to choose the appropriate Excel file path
 function getExcelFilePath() {
     const ec2FilePath = '/home/ec2-user/HomesProjectNode/output_excel_file.xlsx';
-    const localFilePath = 'C:\\code\\BoligsidenWebScrape\\output_excel_file.xlsx';
+    const localFilePath = 'C:\\code\\BoligsidenWebScrape\\BoligsidenWebScrape\\spiders\\output_excel_file.xlsx';
 
     try {
         fs.accessSync(ec2FilePath, fs.constants.F_OK);
