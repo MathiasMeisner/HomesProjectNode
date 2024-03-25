@@ -19,6 +19,6 @@ resource "null_resource" "mongodb_setup" {
     type        = "ssh"
     user        = "ec2-user"
     private_key = file("C:/NewCode/HomesProjectNodeKey.pem")
-    host        = "13.50.13.35"
+    host        = "13.49.159.9"
   }
 }
