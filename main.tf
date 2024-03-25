@@ -7,6 +7,7 @@ resource "aws_instance" "example" {
   instance_type = "t3.micro"
   key_name      = "HomesNodeProject"  # Replace with your EC2 key pair name
   subnet_id     = "subnet-0ba038746f2afd90c"
+  iam_instance_profile = "arn:aws:iam::533266973954:role/HomesProjectNode"
 
   tags = {
     Name = "HomesProjectNode"
