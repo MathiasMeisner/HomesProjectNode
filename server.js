@@ -28,11 +28,17 @@ function getExcelFilePath() {
 
 const excelFilePath = getExcelFilePath(); // Choose Excel file path based on environment
 
-// Middleware to set Content-Type header for JSON responses
+// Middleware to set Content-Type header for HTML responses
 app.use((req, res, next) => {
     res.setHeader('Content-Type', 'text/html');
     next();
 });
+
+// Serve JavaScript files from the 'js' directory
+app.use('/js', (req, res, next) => {
+    res.setHeader('Content-Type', 'text/javascript');
+    next();
+}, express.static('Frontend/js'));
 
 // Serve HTML files from the 'html' directory
 app.use('/html', express.static('Frontend/html'));
