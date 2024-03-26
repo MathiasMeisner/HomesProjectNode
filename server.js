@@ -9,6 +9,7 @@ const { MongoClient } = require('mongodb');
 const { importHomesFromExcel } = require('./Managers/HomeImportService');
 const { connectionString } = require('./Models/connectionstring');
 const fs = require('fs');
+const path = require('path'); // Import the path module
 
 const app = express();
 const port = process.env.PORT || 1337;
@@ -63,6 +64,9 @@ app.get('/', (req, res) => {
 
 // Mount the HomesController router at /api/homes
 app.use('/api/homes', homesRouter);
+
+// Serve static files from the Frontend directory
+app.use(express.static(path.join(__dirname, 'Frontend')));
 
 // Start the server
 const server = http.createServer(app);
