@@ -9,7 +9,6 @@ const { MongoClient } = require('mongodb');
 const { importHomesFromExcel } = require('./Managers/HomeImportService');
 const { connectionString } = require('./Models/connectionstring');
 const fs = require('fs');
-const path = require('path'); // Import the path module
 
 const app = express();
 const port = process.env.PORT || 1337;
@@ -28,12 +27,6 @@ function getExcelFilePath() {
 }
 
 const excelFilePath = getExcelFilePath(); // Choose Excel file path based on environment
-
-// Middleware to set Content-Type header for JSON responses
-app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'application/json');
-    next();
-});
 
 // Import the HomesController router
 const homesRouter = require('./Controllers/HomesController');
@@ -57,16 +50,11 @@ client.connect()
         process.exit(1);
     });
 
-// Define a route handler for the root path 
-app.get('/', (req, res) => {
-    res.send('Welcome to the HomeNode API!');
-});
+// Serve static files from the 'Frontend' directory
+app.use(express.static(__dirname + '/Frontend'));
 
 // Mount the HomesController router at /api/homes
 app.use('/api/homes', homesRouter);
-
-// Serve static files from the Frontend directory
-app.use(express.static(path.join(__dirname, 'Frontend')));
 
 // Start the server
 const server = http.createServer(app);
