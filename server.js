@@ -52,6 +52,9 @@ app.use('/html', express.static('Frontend/html'));
 //// Serve CSS files from the 'css' directory
 app.use('/css', express.static('Frontend/css'));
 
+// Serve JavaScript files from the 'js' directory
+app.use('/js', express.static('Frontend/js'));
+
 // Import the HomesController router
 const homesRouter = require('./Controllers/HomesController');
 
