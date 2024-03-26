@@ -34,6 +34,12 @@ app.use((req, res, next) => {
     next();
 });
 
+// Middleware to set Content-Type header for CSS responses
+app.use('/css', (req, res, next) => {
+    res.setHeader('Content-Type', 'text/css');
+    next();
+}, express.static('Frontend/css'));
+
 // Serve JavaScript files from the 'js' directory
 app.use('/js', (req, res, next) => {
     res.setHeader('Content-Type', 'text/javascript');
