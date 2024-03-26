@@ -47,7 +47,7 @@ app.use('/js', (req, res, next) => {
 }/*, express.static('Frontend/js')*/);
 
 // Serve HTML files from the 'html' directory
-//app.use('/html', express.static('Frontend/html'));
+app.use('/html', express.static('Frontend/html'));
 
 //// Serve CSS files from the 'css' directory
 //app.use('/css', express.static('Frontend/css'));
