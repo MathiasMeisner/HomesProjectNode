@@ -28,6 +28,9 @@ function getExcelFilePath() {
 
 const excelFilePath = getExcelFilePath(); // Choose Excel file path based on environment
 
+// Serve static files from the 'Frontend' directory
+app.use(express.static('Frontend'));
+
 // Import the HomesController router
 const homesRouter = require('./Controllers/HomesController');
 
@@ -50,8 +53,6 @@ client.connect()
         process.exit(1);
     });
 
-// Serve static files from the 'Frontend' directory
-app.use(express.static(__dirname + '/Frontend'));
 
 // Mount the HomesController router at /api/homes
 app.use('/api/homes', homesRouter);
