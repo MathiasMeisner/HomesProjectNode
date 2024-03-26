@@ -33,7 +33,7 @@ app.use(express.static('Frontend'));
 
 // Middleware to set Content-Type header for JSON responses
 app.use((req, res, next) => {
-    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Type', 'text/html');
     next();
 });
 
