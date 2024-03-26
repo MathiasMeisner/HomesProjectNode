@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const homesList = document.getElementById("homesList");
 
-  fetch("http://localhost:1337/api/homes")
+  fetch("http://13.49.159.9:1337/api/homes")
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
