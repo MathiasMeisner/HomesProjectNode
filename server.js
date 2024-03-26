@@ -50,7 +50,7 @@ app.use('/js', (req, res, next) => {
 app.use('/html', express.static('Frontend/html'));
 
 //// Serve CSS files from the 'css' directory
-//app.use('/css', express.static('Frontend/css'));
+app.use('/css', express.static('Frontend/css'));
 
 // Import the HomesController router
 const homesRouter = require('./Controllers/HomesController');
