@@ -31,6 +31,12 @@ const excelFilePath = getExcelFilePath(); // Choose Excel file path based on env
 // Serve static files from the 'Frontend' directory
 app.use(express.static('Frontend'));
 
+// Middleware to set Content-Type header for JSON responses
+app.use((req, res, next) => {
+    res.setHeader('Content-Type', 'application/json');
+    next();
+});
+
 // Import the HomesController router
 const homesRouter = require('./Controllers/HomesController');
 
